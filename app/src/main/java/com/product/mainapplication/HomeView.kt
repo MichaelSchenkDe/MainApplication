@@ -1,36 +1,25 @@
 package com.product.mainapplication
 
-import android.content.Context
-import android.graphics.BitmapFactory
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.product.mainapplication.Baking.imageDescriptions
-import com.product.mainapplication.Baking.images
+import com.product.mainapplication.ui.views.DashboardScreen
+import com.product.mainapplication.ui.views.FavoritesScreen
+import com.product.mainapplication.ui.views.HomeScreen
+import com.product.mainapplication.ui.views.SettingsScreen
+import com.product.mainapplication.ui.views.TaskScreen
 
 @Composable
 fun HomeView(
@@ -43,10 +32,10 @@ fun HomeView(
     var result by rememberSaveable { mutableStateOf(placeholderResult) }
     val uiState by homeViewModel.uiState.collectAsState()
     val context = LocalContext.current
-
     val navController = rememberNavController()
+
     val bottomNavItems = listOf(
-        "Home", "Recipes", "Favorites", "Tasks", "Settings"
+        "Home", "Dashboard", "Favorites", "Tasks", "Settings"
     )
 
     Scaffold(
@@ -64,9 +53,7 @@ fun HomeView(
                         "Settings" -> R.drawable.ic_account_24
                         else -> R.drawable.ic_person_24
                     }
-
                     val isSelected = currentRoute(navController) == item
-
                     NavigationBarItem(
                         icon = {
                             Icon(
@@ -92,7 +79,7 @@ fun HomeView(
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = "Home", modifier = Modifier.padding(innerPadding)) {
             composable("Home") {
-                HomeContent(
+                HomeScreen(
                     homeViewModel,
                     selectedImage,
                     placeholderPrompt,
@@ -101,134 +88,16 @@ fun HomeView(
                     context
                 )
             }
-            composable("Recipes") { RecipesContent() }
-            composable("Favorites") { FavoritesContent() }
-            composable("Tasks") { ProfileContent() }
-            composable("Settings") { SettingsContent() }
+            composable("Dashboard") { DashboardScreen() }
+            composable("Favorites") { FavoritesScreen() }
+            composable("Tasks") { TaskScreen() }
+            composable("Settings") { SettingsScreen() }
         }
     }
-}
-
-@Composable
-fun HomeContent(
-    homeViewModel: HomeViewModel,
-    selectedImage: MutableIntState,
-    placeholderPrompt: String,
-    placeholderResult: String,
-    uiState: UiState,
-    context: Context
-) {
-    var prompt by rememberSaveable { mutableStateOf(placeholderPrompt) }
-    var result by rememberSaveable { mutableStateOf(placeholderResult) }
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text(
-            text = stringResource(R.string.baking_title),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        LazyRow(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            itemsIndexed(images) { index, image ->
-                var imageModifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp)
-                    .requiredSize(200.dp)
-                    .clickable {
-                        selectedImage.intValue = index
-                    }
-                if (index == selectedImage.intValue) {
-                    imageModifier =
-                        imageModifier.border(BorderStroke(4.dp, MaterialTheme.colorScheme.primary))
-                }
-                Image(
-                    painter = painterResource(image),
-                    contentDescription = stringResource(imageDescriptions[index]),
-                    modifier = imageModifier
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier.padding(all = 16.dp)
-        ) {
-            TextField(
-                value = prompt,
-                label = { Text(stringResource(R.string.label_prompt)) },
-                onValueChange = { prompt = it },
-                modifier = Modifier
-                    .weight(0.8f)
-                    .padding(end = 16.dp)
-                    .align(Alignment.CenterVertically)
-            )
-
-            Button(
-                onClick = {
-                    val bitmap = BitmapFactory.decodeResource(
-                        context.resources,
-                        images[selectedImage.intValue]
-                    )
-                    homeViewModel.sendPrompt(bitmap, prompt)
-                },
-                enabled = prompt.isNotEmpty(),
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-            ) {
-                Text(text = stringResource(R.string.action_go))
-            }
-        }
-
-        if (uiState is UiState.Loading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            var textColor = MaterialTheme.colorScheme.onSurface
-            if (uiState is UiState.Error) {
-                textColor = MaterialTheme.colorScheme.error
-                result = uiState.errorMessage
-            } else if (uiState is UiState.Success) {
-                textColor = MaterialTheme.colorScheme.onSurface
-                result = uiState.outputText
-            }
-            val scrollState = rememberScrollState()
-            Text(
-                text = result,
-                textAlign = TextAlign.Start,
-                color = textColor,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(16.dp)
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-            )
-        }
-    }
-}
-
-@Composable
-fun RecipesContent() {
-    Text("Recipes Content")
-}
-
-@Composable
-fun FavoritesContent() {
-    Text("Favorites Content")
-}
-
-@Composable
-fun ProfileContent() {
-    Text("Profile Content")
-}
-
-@Composable
-fun SettingsContent() {
-    Text("Settings Content")
 }
 
 @Composable
 fun currentRoute(navController: NavHostController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     return navBackStackEntry?.destination?.route
-
 }
