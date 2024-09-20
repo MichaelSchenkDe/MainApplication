@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -59,7 +60,8 @@ fun HomeView(
                             Icon(
                                 painter = painterResource(id = iconResourceId),
                                 contentDescription = item,
-                                tint = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                                tint = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                                modifier = Modifier.size(24.dp)
                             )
                         },
                         label = {
@@ -68,7 +70,7 @@ fun HomeView(
                                 color = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current
                             )
                         },
-                        selected = isSelected, // Set the selected state based on the current route
+                        selected = isSelected,
                         onClick = {
                             navController.navigate(item)
                         }

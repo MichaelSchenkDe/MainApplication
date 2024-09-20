@@ -1,4 +1,4 @@
-package com.product.mainapplication.ui.views
+package com.product.mainapplication.ui.models
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel

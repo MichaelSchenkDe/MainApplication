@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.product.mainapplication.R
 import com.product.mainapplication.UiState
+import com.product.mainapplication.ui.models.BakingViewModel
 
 val images = arrayOf(
     // Image generated using Gemini from the prompt "cupcake image"
