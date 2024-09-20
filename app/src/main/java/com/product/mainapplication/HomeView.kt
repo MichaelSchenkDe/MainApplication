@@ -10,37 +10,27 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.product.mainapplication.Baking.imageDescriptions
 import com.product.mainapplication.Baking.images
-
-val image = arrayOf(
-    // Image generated using Gemini from the prompt "cupcake image"
-    R.drawable.baked_goods_1,
-    // Image generated using Gemini from the prompt "cookies images"
-    R.drawable.baked_goods_2,
-    // Image generated using Gemini from the prompt "cake images"
-    R.drawable.baked_goods_3,
-)
-val imageDescription = arrayOf(
-    R.string.image1_description,
-    R.string.image2_description,
-    R.string.image3_description,
-)
 
 @Composable
 fun HomeView(
@@ -56,17 +46,42 @@ fun HomeView(
 
     val navController = rememberNavController()
     val bottomNavItems = listOf(
-        "Home", "Recipes", "Favorites", "Profile", "Settings"
+        "Home", "Recipes", "Favorites", "Tasks", "Settings"
     )
 
     Scaffold(
+        contentColor = Color.Blue,
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = Color.White,
+            ) {
                 bottomNavItems.forEachIndexed { _, item ->
+                    val iconResourceId = when (item) {
+                        "Home" -> R.drawable.ic_home_24
+                        "Recipes" -> R.drawable.ic_dashboard_24
+                        "Favorites" -> R.drawable.ic_code_24
+                        "Tasks" -> R.drawable.ic_schedule_24
+                        "Settings" -> R.drawable.ic_account_24
+                        else -> R.drawable.ic_person_24
+                    }
+
+                    val isSelected = currentRoute(navController) == item
+
                     NavigationBarItem(
-                        icon = { Icon(painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = item) }, // Replace with appropriate icons
-                        label = { Text(item) },
-                        selected = false,
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = iconResourceId),
+                                contentDescription = item,
+                                tint = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = item,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                            )
+                        },
+                        selected = isSelected, // Set the selected state based on the current route
                         onClick = {
                             navController.navigate(item)
                         }
@@ -88,7 +103,7 @@ fun HomeView(
             }
             composable("Recipes") { RecipesContent() }
             composable("Favorites") { FavoritesContent() }
-            composable("Profile") { ProfileContent() }
+            composable("Tasks") { ProfileContent() }
             composable("Settings") { SettingsContent() }
         }
     }
@@ -171,10 +186,10 @@ fun HomeContent(
             var textColor = MaterialTheme.colorScheme.onSurface
             if (uiState is UiState.Error) {
                 textColor = MaterialTheme.colorScheme.error
-                result = (uiState as UiState.Error).errorMessage
+                result = uiState.errorMessage
             } else if (uiState is UiState.Success) {
                 textColor = MaterialTheme.colorScheme.onSurface
-                result = (uiState as UiState.Success).outputText
+                result = uiState.outputText
             }
             val scrollState = rememberScrollState()
             Text(
@@ -191,7 +206,6 @@ fun HomeContent(
     }
 }
 
-// Placeholder content for other tabs
 @Composable
 fun RecipesContent() {
     Text("Recipes Content")
@@ -210,4 +224,11 @@ fun ProfileContent() {
 @Composable
 fun SettingsContent() {
     Text("Settings Content")
+}
+
+@Composable
+fun currentRoute(navController: NavHostController): String? {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    return navBackStackEntry?.destination?.route
+
 }
