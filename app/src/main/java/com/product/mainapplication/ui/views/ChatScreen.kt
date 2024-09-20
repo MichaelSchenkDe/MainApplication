@@ -38,7 +38,7 @@ import com.product.mainapplication.R
 import com.product.mainapplication.UiState
 
 @Composable
-fun TaskScreen(
+fun ChatScreen(
     homeViewModel: HomeViewModel,
     selectedImage: MutableIntState,
     placeholderPrompt: String,

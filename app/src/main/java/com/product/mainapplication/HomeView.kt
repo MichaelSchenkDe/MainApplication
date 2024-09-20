@@ -16,10 +16,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.product.mainapplication.ui.views.AddScreen
+import com.product.mainapplication.ui.views.ChatScreen
 import com.product.mainapplication.ui.views.HomeScreen
 import com.product.mainapplication.ui.views.SettingsScreen
 import com.product.mainapplication.ui.views.ShopScreen
-import com.product.mainapplication.ui.views.TaskScreen
 
 @Composable
 fun HomeView(
@@ -33,11 +33,10 @@ fun HomeView(
     val navController = rememberNavController()
 
     val bottomNavItems = listOf(
-        "Home", "Shop", "Add", "Tasks", "Settings"
+        "Home", "Shop", "Add", "Chat", "Settings"
     )
 
     Scaffold(
-        contentColor = Color.Blue,
         bottomBar = {
             NavigationBar(
                 containerColor = Color.White,
@@ -47,7 +46,7 @@ fun HomeView(
                         "Home" -> R.drawable.ic_home_24
                         "Shop" -> R.drawable.ic_cart_24
                         "Add" -> R.drawable.ic_add_circle_24
-                        "Tasks" -> R.drawable.ic_schedule_24
+                        "Chat" -> R.drawable.ic_schedule_24
                         "Settings" -> R.drawable.ic_account_24
                         else -> R.drawable.ic_code_24
                     }
@@ -57,7 +56,7 @@ fun HomeView(
                             Icon(
                                 painter = painterResource(id = iconResourceId),
                                 contentDescription = item,
-                                tint = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                                tint = if (isSelected) Color.LightGray else LocalContentColor.current,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -80,8 +79,8 @@ fun HomeView(
             composable("Home") { HomeScreen() }
             composable("Shop") { ShopScreen() }
             composable("Add") { AddScreen() }
-            composable("Tasks") {
-                TaskScreen(
+            composable("Chat") {
+                ChatScreen(
                 homeViewModel,
                 selectedImage,
                 placeholderPrompt,

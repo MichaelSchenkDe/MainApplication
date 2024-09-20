@@ -1,11 +1,16 @@
 <resources>
-    <string name="app_name">MainApplication</string>
+    <string name="app_name">AI Assistant</string>
     <string name="action_go">Go</string>
-    <string name="baking_title">Baking with Gemini</string>
+    <string name="baking_title">AI Assistant</string>
     <string name="label_prompt">Prompt</string>
     <string name="prompt_placeholder">Provide a recipe for the baked goods in the image</string>
     <string name="image1_description">Cupcake</string>
     <string name="image2_description">Cookies</string>
     <string name="image3_description">Cake</string>
     <string name="results_placeholder">(Results will appear here)</string>
+    <string name="title_home">Home</string>
+    <string name="title_shop">Shop</string>
+    <string name="title_add">Add</string>
+    <string name="title_chat">Chat</string>
+    <string name="title_settings">Settings</string>
 </resources>
