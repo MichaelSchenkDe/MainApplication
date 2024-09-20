@@ -45,7 +45,7 @@ fun ShopScreen() {
                         contentDescription = "Card Image",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(100.dp),
                         contentScale = ContentScale.Crop
                     )
 
