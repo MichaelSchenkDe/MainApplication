@@ -55,16 +55,6 @@ fun SettingsScreen() {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                //                Button(
-                //                    onClick = { /* Handle action for Notifications */ },
-                //                    modifier = Modifier.fillMaxWidth(0.8f),
-                //                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                //                ) {
-                //                    Text("Notifications", color = MaterialTheme.colorScheme.onPrimaryContainer)
-                //                }
-                //
-                //                Spacer(modifier = Modifier.height(16.dp))
-
                 Button(
                     onClick = { /* Handle action for Privacy */ },
                     modifier = Modifier.fillMaxWidth(0.8f),

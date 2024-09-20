@@ -77,19 +77,17 @@ fun HomeView(
         }
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = "Home", modifier = Modifier.padding(innerPadding)) {
-            composable("Home") {
-                HomeScreen(
-                    homeViewModel,
-                    selectedImage,
-                    placeholderPrompt,
-                    placeholderResult,
-                    uiState,
-                    context
-                )
-            }
+            composable("Home") { HomeScreen() }
             composable("Shop") { ShopScreen() }
             composable("Add") { AddScreen() }
-            composable("Tasks") { TaskScreen() }
+            composable("Tasks") {
+                TaskScreen(
+                homeViewModel,
+                selectedImage,
+                placeholderPrompt,
+                placeholderResult,
+                uiState,
+                context) }
             composable("Settings") { SettingsScreen() }
         }
     }
