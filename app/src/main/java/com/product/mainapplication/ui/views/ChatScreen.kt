@@ -10,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -65,11 +66,17 @@ fun ChatScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = stringResource(R.string.baking_title),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(16.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth() // Ensure the Row fills the available width
+                .background(Color.LightGray) // Set the background color to LightGray
+                .padding(16.dp), // Apply padding after setting the background
+        ) {
+            Text(
+                text = stringResource(R.string.baking_title),
+                style = MaterialTheme.typography.titleLarge,
+            )
+        }
 
         Row(
             modifier = Modifier
@@ -82,15 +89,27 @@ fun ChatScreen(
                     .weight(1f) // Occupy 50% of the width
                     .then(if (selectedImage != null) Modifier.aspectRatio(1f) else Modifier) // Conditional aspect ratio
             ) {
-                selectedImage?.let {
+                if(selectedImage != null)
+                {
                     Image(
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = "Selected Image",
-                        modifier = Modifier
-                            .fillMaxSize() // Fill the entire Box
-                            .clip(RectangleShape), // Clip to a rectangle (square in this case)
-                        contentScale = ContentScale.Crop // Crop the image to fit the Box
-                    )
+                    bitmap = selectedImage!!.asImageBitmap(),
+                    contentDescription = "Selected Image",
+                    modifier = Modifier
+                        .fillMaxSize() // Fill the entire Box
+                        .clip(RectangleShape), // Clip to a rectangle (square in this case)
+                    contentScale = ContentScale.Crop)
+                } else {
+                    Box(
+                        modifier = Modifier, // Keep the original size of the Box
+                        contentAlignment = Alignment.Center // Center the content within the Box
+                    ) {
+                        Text(
+                            text = stringResource(R.string.box_description),
+                            fontSize = 12.sp,
+                            textAlign =  TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth() // Make the Text fill the width of the Box
+                        )
+                    }
                 }
             }
 
@@ -111,7 +130,12 @@ fun ChatScreen(
                 )
             }
         }
-
+        HorizontalDivider(
+            // Add the Divider composable here
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp) // Add some padding above the Divider
+        )
         Row(
             modifier = Modifier.padding(all = 16.dp)
         ) {

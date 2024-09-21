@@ -1,5 +1,6 @@
 package com.product.mainapplication.ui.views
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -8,8 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.product.mainapplication.R
 
@@ -22,19 +23,27 @@ fun SettingsScreen() {
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Device Name (above the icon)
+            Text(
+                text = Build.MODEL,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(top = 128.dp)
+            )
+
             // Profile Picture Icon (centered)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f), // Occupy remaining space
+                    .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_account_48), // Replace with your actual profile picture resource
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape)
+                    painter = painterResource(id = R.drawable.ic_account_48),
+
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(150.dp)
+                    .clip(CircleShape)
                 )
             }
 
@@ -48,9 +57,9 @@ fun SettingsScreen() {
                 Button(
                     onClick = { /* Handle action for Edit Profile */ },
                     modifier = Modifier.fillMaxWidth(0.8f),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
                 ) {
-                    Text("Edit Profile", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text("Edit Profile", color = MaterialTheme.colorScheme.primary)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -58,36 +67,12 @@ fun SettingsScreen() {
                 Button(
                     onClick = { /* Handle action for Privacy */ },
                     modifier = Modifier.fillMaxWidth(0.8f),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
                 ) {
-                    Text("Privacy", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Text("Privacy", color = MaterialTheme.colorScheme.primary)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Dark Mode Toggle Button
-//                Button(
-//                    onClick = { isDarkModeEnabled = !isDarkModeEnabled },
-//                    modifier = Modifier.fillMaxWidth(0.8f),
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = if (isDarkModeEnabled) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primaryContainer
-//                    )
-//                ) {
-//                    Text(
-//                        text = if (isDarkModeEnabled) "Disable Dark Mode" else "Enable Dark Mode",
-//                        color = if (isDarkModeEnabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onPrimaryContainer
-//                    )
-//                }
-
-//                Spacer(modifier = Modifier.height(16.dp))
-//
-//                Button(
-//                    onClick = { /* Handle action for Logout */ },
-//                    modifier = Modifier.fillMaxWidth(0.8f),
-//                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-//                ) {
-//                    Text("Logout", color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Bold)
-//                }
             }
         }
     }
