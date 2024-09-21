@@ -106,7 +106,7 @@ fun ChatScreen(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_upload_48),
                     contentDescription = "Upload Image",
-                    modifier = Modifier.size(64.dp), // Adjust the icon size as needed
+                    modifier = Modifier.size(48.dp), // Adjust the icon size as needed
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
