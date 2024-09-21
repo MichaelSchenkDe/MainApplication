@@ -1,5 +1,6 @@
 package com.product.mainapplication
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,8 +26,8 @@ import com.product.mainapplication.ui.views.ShopScreen
 fun HomeView(
     homeViewModel: HomeViewModel = viewModel()
 ) {
-    val selectedImage = remember { mutableIntStateOf(0) }
-    val placeholderPrompt = stringResource(R.string.prompt_placeholder)
+    // Wrap the nullable type in a non-null delegate
+    var selectedChatImage by remember { mutableStateOf<Bitmap?>(null) }
     val placeholderResult = stringResource(R.string.results_placeholder)
     val uiState by homeViewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -89,8 +90,10 @@ fun HomeView(
             composable("Chat") {
                 ChatScreen(
                 homeViewModel,
-                selectedImage,
-                placeholderPrompt,
+                    onImageSelectedFromHome = { bitmap ->
+                        selectedChatImage = bitmap
+                    },
+                "",
                 placeholderResult,
                 uiState,
                 context) }

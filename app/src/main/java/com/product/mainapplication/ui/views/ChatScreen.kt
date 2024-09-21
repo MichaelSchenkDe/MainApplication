@@ -1,38 +1,35 @@
 package com.product.mainapplication.ui.views
 
 import android.content.Context
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.product.mainapplication.HomeViewModel
 import com.product.mainapplication.R
 import com.product.mainapplication.UiState
@@ -40,14 +37,31 @@ import com.product.mainapplication.UiState
 @Composable
 fun ChatScreen(
     homeViewModel: HomeViewModel,
-    selectedImage: MutableIntState,
+    onImageSelectedFromHome: (Bitmap?) -> Unit,
     placeholderPrompt: String,
     placeholderResult: String,
     uiState: UiState,
-    context: Context
+    context: Context,
 ) {
     var prompt by rememberSaveable { mutableStateOf(placeholderPrompt) }
     var result by rememberSaveable { mutableStateOf(placeholderResult) }
+
+    // State to hold the selected image (now managed within ChatScreen)
+    var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
+
+    // Launcher for image selection
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            selectedImage = context.loadBitmapFromUri(uri)
+        }
+    }
+    // Call the callback when an image is selected from HomeView
+    LaunchedEffect(selectedImage) {
+        onImageSelectedFromHome(selectedImage)
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -57,24 +71,43 @@ fun ChatScreen(
             modifier = Modifier.padding(16.dp)
         )
 
-        LazyRow(
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
-            itemsIndexed(images) { index, image ->
-                var imageModifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp)
-                    .requiredSize(200.dp)
-                    .clickable {
-                        selectedImage.intValue = index
-                    }
-                if (index == selectedImage.intValue) {
-                    imageModifier =
-                        imageModifier.border(BorderStroke(4.dp, MaterialTheme.colorScheme.primary))
+            // Display selected image if available
+            Box(
+                modifier = Modifier
+                    .weight(1f) // Occupy 50% of the width
+                    .then(if (selectedImage != null) Modifier.aspectRatio(1f) else Modifier) // Conditional aspect ratio
+            ) {
+                selectedImage?.let {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = "Selected Image",
+                        modifier = Modifier
+                            .fillMaxSize() // Fill the entire Box
+                            .clip(RectangleShape), // Clip to a rectangle (square in this case)
+                        contentScale = ContentScale.Crop // Crop the image to fit the Box
+                    )
                 }
-                Image(
-                    painter = painterResource(image),
-                    contentDescription = stringResource(imageDescriptions[index]),
-                    modifier = imageModifier
+            }
+
+            // Upload icon
+            Box(
+                modifier = Modifier
+                    .weight(1f) // Occupy 50% of the width
+                    .then(if (selectedImage != null) Modifier.aspectRatio(1f) else Modifier)
+                    .clickable { launcher.launch("image/*") }
+                    .border(BorderStroke(1.dp, Color.Gray)), // Add border here
+                contentAlignment = Alignment.Center // Center the icon within the Box
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_upload_48),
+                    contentDescription = "Upload Image",
+                    modifier = Modifier.size(64.dp), // Adjust the icon size as needed
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
         }
@@ -84,23 +117,22 @@ fun ChatScreen(
         ) {
             TextField(
                 value = prompt,
-                label = { Text(stringResource(R.string.label_prompt)) },
                 onValueChange = { prompt = it },
                 modifier = Modifier
                     .weight(0.8f)
                     .padding(end = 16.dp)
-                    .align(Alignment.CenterVertically)
+                    .align(Alignment.CenterVertically),
+                placeholder = { Text(stringResource(R.string.prompt_placeholder)) }
             )
-
             Button(
                 onClick = {
-                    val bitmap = BitmapFactory.decodeResource(
-                        context.resources,
-                        images[selectedImage.intValue]
-                    )
-                    homeViewModel.sendPrompt(bitmap, prompt)
+                    selectedImage?.let {
+                        homeViewModel.sendPromptWithImage(it, prompt)
+                    } ?: run {
+                        homeViewModel.sendPrompt(prompt)
+                    }
                 },
-                enabled = prompt.isNotEmpty(),
+                enabled = prompt.isNotEmpty(), // Enable the button only if there's a prompt
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
             ) {
@@ -124,6 +156,7 @@ fun ChatScreen(
                 text = result,
                 textAlign = TextAlign.Start,
                 color = textColor,
+                fontSize = 12.sp,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(16.dp)
@@ -131,5 +164,15 @@ fun ChatScreen(
                     .verticalScroll(scrollState)
             )
         }
+    }
+}
+
+// Helper function to load Bitmap from Uri
+fun Context.loadBitmapFromUri(uri: Uri): Bitmap? {
+    return if (Build.VERSION.SDK_INT < 28) {
+        MediaStore.Images.Media.getBitmap(contentResolver, uri)
+    } else {
+        val source = ImageDecoder.createSource(contentResolver, uri)
+        ImageDecoder.decodeBitmap(source)
     }
 }
