@@ -33,7 +33,11 @@ fun HomeView(
     val navController = rememberNavController()
 
     val bottomNavItems = listOf(
-        "Home", "Shop", "Add", "Chat", "Settings"
+        stringResource(R.string.title_home),
+        stringResource(R.string.title_shop),
+        stringResource(R.string.title_add),
+        stringResource(R.string.title_chat),
+        stringResource(R.string.title_settings)
     )
 
     Scaffold(
@@ -43,11 +47,11 @@ fun HomeView(
             ) {
                 bottomNavItems.forEachIndexed { _, item ->
                     val iconResourceId = when (item) {
-                        "Home" -> R.drawable.ic_home_24
-                        "Shop" -> R.drawable.ic_cart_24
-                        "Add" -> R.drawable.ic_add_circle_24
-                        "Chat" -> R.drawable.ic_schedule_24
-                        "Settings" -> R.drawable.ic_account_24
+                        stringResource(R.string.title_home) -> R.drawable.ic_home_24
+                        stringResource(R.string.title_shop) -> R.drawable.ic_cart_24
+                        stringResource(R.string.title_add) -> R.drawable.ic_add_circle_24
+                        stringResource(R.string.title_chat) -> R.drawable.ic_schedule_24
+                        stringResource(R.string.title_settings) -> R.drawable.ic_account_24
                         else -> R.drawable.ic_code_24
                     }
                     val isSelected = currentRoute(navController) == item
@@ -56,7 +60,7 @@ fun HomeView(
                             Icon(
                                 painter = painterResource(id = iconResourceId),
                                 contentDescription = item,
-                                tint = if (isSelected) Color.LightGray else LocalContentColor.current,
+                                tint = if (isSelected) MaterialTheme.colorScheme.primary else LocalContentColor.current,
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -69,13 +73,16 @@ fun HomeView(
                         selected = isSelected,
                         onClick = {
                             navController.navigate(item)
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.LightGray
+                        )
                     )
                 }
             }
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = "Home", modifier = Modifier.padding(innerPadding)) {
+        NavHost(navController = navController, startDestination = stringResource(R.string.title_home) , modifier = Modifier.padding(innerPadding)) {
             composable("Home") { HomeScreen() }
             composable("Shop") { ShopScreen() }
             composable("Add") { AddScreen() }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AI Assistant</string>
+    <string name="app_name">My AI</string>
     <string name="action_go">Go</string>
     <string name="baking_title">AI Assistant</string>
     <string name="label_prompt">Prompt</string>
