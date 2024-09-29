@@ -28,7 +28,6 @@ fun HomeView(
 ) {
     // Wrap the nullable type in a non-null delegate
     var selectedChatImage by remember { mutableStateOf<Bitmap?>(null) }
-    val placeholderResult = stringResource(R.string.results_placeholder)
     val uiState by homeViewModel.uiState.collectAsState()
     val context = LocalContext.current
     val navController = rememberNavController()
@@ -86,17 +85,16 @@ fun HomeView(
         NavHost(navController = navController, startDestination = stringResource(R.string.title_home) , modifier = Modifier.padding(innerPadding)) {
             composable("Home") { HomeScreen() }
             composable("Shop") { ShopScreen() }
-            composable("Add") { AddScreen() }
-            composable("Chat") {
-                ChatScreen(
+            composable("Add") { AddScreen(
                 homeViewModel,
-                    onImageSelectedFromHome = { bitmap ->
-                        selectedChatImage = bitmap
-                    },
+                onImageSelectedFromHome = { bitmap ->
+                    selectedChatImage = bitmap
+                },
                 "",
-                placeholderResult,
+                "",
                 uiState,
                 context) }
+            composable("Chat") { ChatScreen() }
             composable("Settings") { SettingsScreen() }
         }
     }

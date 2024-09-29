@@ -36,32 +36,8 @@ import com.product.mainapplication.R
 import com.product.mainapplication.UiState
 
 @Composable
-fun ChatScreen(
-    homeViewModel: HomeViewModel,
-    onImageSelectedFromHome: (Bitmap?) -> Unit,
-    placeholderPrompt: String,
-    placeholderResult: String,
-    uiState: UiState,
-    context: Context,
-) {
-    var prompt by rememberSaveable { mutableStateOf(placeholderPrompt) }
-    var result by rememberSaveable { mutableStateOf(placeholderResult) }
-
-    // State to hold the selected image (now managed within ChatScreen)
-    var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
-
-    // Launcher for image selection
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            selectedImage = context.loadBitmapFromUri(uri)
-        }
-    }
-    // Call the callback when an image is selected from HomeView
-    LaunchedEffect(selectedImage) {
-        onImageSelectedFromHome(selectedImage)
-    }
+fun ChatScreen() {
+    val selectedImage by remember { mutableStateOf<Bitmap?>(null) }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -75,117 +51,6 @@ fun ChatScreen(
             Text(
                 text = stringResource(R.string.baking_title),
                 style = MaterialTheme.typography.titleLarge,
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            // Display selected image if available
-            Box(
-                modifier = Modifier
-                    .weight(1f) // Occupy 50% of the width
-                    .then(if (selectedImage != null) Modifier.aspectRatio(1f) else Modifier) // Conditional aspect ratio
-            ) {
-                if(selectedImage != null)
-                {
-                    Image(
-                    bitmap = selectedImage!!.asImageBitmap(),
-                    contentDescription = "Selected Image",
-                    modifier = Modifier
-                        .fillMaxSize() // Fill the entire Box
-                        .clip(RectangleShape), // Clip to a rectangle (square in this case)
-                    contentScale = ContentScale.Crop)
-                } else {
-                    Box(
-                        modifier = Modifier, // Keep the original size of the Box
-                        contentAlignment = Alignment.Center // Center the content within the Box
-                    ) {
-                        Text(
-                            text = stringResource(R.string.box_description),
-                            fontSize = 12.sp,
-                            textAlign =  TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth() // Make the Text fill the width of the Box
-                        )
-                    }
-                }
-            }
-
-            // Upload icon
-            Box(
-                modifier = Modifier
-                    .weight(1f) // Occupy 50% of the width
-                    .then(if (selectedImage != null) Modifier.aspectRatio(1f) else Modifier)
-                    .clickable { launcher.launch("image/*") }
-                    .border(BorderStroke(1.dp, Color.Gray)), // Add border here
-                contentAlignment = Alignment.Center // Center the icon within the Box
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_upload_48),
-                    contentDescription = "Upload Image",
-                    modifier = Modifier.size(48.dp), // Adjust the icon size as needed
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
-        HorizontalDivider(
-            // Add the Divider composable here
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp) // Add some padding above the Divider
-        )
-        Row(
-            modifier = Modifier.padding(all = 16.dp)
-        ) {
-            TextField(
-                value = prompt,
-                onValueChange = { prompt = it },
-                modifier = Modifier
-                    .weight(0.8f)
-                    .padding(end = 16.dp)
-                    .align(Alignment.CenterVertically),
-                placeholder = { Text(stringResource(R.string.prompt_placeholder)) }
-            )
-            Button(
-                onClick = {
-                    selectedImage?.let {
-                        homeViewModel.sendPromptWithImage(it, prompt)
-                    } ?: run {
-                        homeViewModel.sendPrompt(prompt)
-                    }
-                },
-                enabled = prompt.isNotEmpty(), // Enable the button only if there's a prompt
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-            ) {
-                Text(text = stringResource(R.string.action_go))
-            }
-        }
-
-        if (uiState is UiState.Loading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            var textColor = MaterialTheme.colorScheme.onSurface
-            if (uiState is UiState.Error) {
-                textColor = MaterialTheme.colorScheme.error
-                result = uiState.errorMessage
-            } else if (uiState is UiState.Success) {
-                textColor = MaterialTheme.colorScheme.onSurface
-                result = uiState.outputText
-            }
-            val scrollState = rememberScrollState()
-            Text(
-                text = result,
-                textAlign = TextAlign.Start,
-                color = textColor,
-                fontSize = 12.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(16.dp)
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
             )
         }
     }
