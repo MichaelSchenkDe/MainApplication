@@ -2,15 +2,11 @@ package com.product.mainapplication.ui.views
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -219,13 +215,4 @@ fun AddScreen(
         }
     }
 
-    // Helper function to load Bitmap from Uri
-    fun Context.loadBitmapFromUri(uri: Uri): Bitmap? {
-        return if (Build.VERSION.SDK_INT < 28) {
-            MediaStore.Images.Media.getBitmap(contentResolver, uri)
-        } else {
-            val source = ImageDecoder.createSource(contentResolver, uri)
-            ImageDecoder.decodeBitmap(source)
-        }
-    }
 }
